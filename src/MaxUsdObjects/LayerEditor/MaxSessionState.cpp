@@ -84,7 +84,7 @@ bool MaxSessionState::getStageEntry(StageEntry* entry, USDStageObject* object)
 
     auto referencingNodes = MaxUsd::GetReferencingNodes(object);
 
-    if (referencingNodes.size() == 0) {
+    if (referencingNodes.Count() == 0) {
         return false;
     }
 
@@ -250,11 +250,30 @@ bool MaxSessionState::saveLayerUI(
     std::string*                  out_filePath,
     const PXR_NS::SdfLayerRefPtr& parentLayer) const
 {
+#ifdef MAX_2022
+    // The 3ds Max 2022 UsdLayerEditor does not export SaveLayersDialog::saveLayerFilePathUI,
+    // so use a standard Qt save dialog to obtain the destination path (mirrors loadLayersUI).
+    std::string defaultPath;
+    if (parentLayer) {
+        defaultPath = fs::path(parentLayer->GetRealPath()).parent_path().string();
+    }
+    const QString file = QFileDialog::getSaveFileName(
+        in_parent,
+        tr("Save Universal Scene Description (USD) File"),
+        QString::fromStdString(defaultPath),
+        tr("USD (*.usd;*.usda;*.usdc)"));
+    if (file.isEmpty()) {
+        return false;
+    }
+    *out_filePath = file.toStdString();
+    return true;
+#else
     std::string parentPath;
     if (parentLayer) {
         parentPath = fs::path(parentLayer->GetRealPath()).parent_path().string();
     }
     return SaveLayersDialog::saveLayerFilePathUI(*out_filePath, parentPath);
+#endif
 }
 
 std::vector<std::string>

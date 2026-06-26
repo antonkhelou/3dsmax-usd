@@ -22,7 +22,9 @@
 
 #include <usdUfe/ufe/Global.h>
 #include <usdUfe/ufe/UsdSceneItem.h>
+#ifndef MAX_2022 // UsdUndoDeleteCommand was added to UsdUfe after 3ds Max 2022 support was dropped.
 #include <usdUfe/ufe/UsdUndoDeleteCommand.h>
+#endif
 
 #include <ufe/globalSelection.h>
 #include <ufe/observableSelection.h>
@@ -182,9 +184,11 @@ Ufe::UndoableCommand::Ptr MaxUsdContextOps::doOpCmd(const ItemPath& itemPath)
         return object3d->makeVisibleCmd(!current);
     }
 
+#ifndef MAX_2022 // UsdUndoDeleteCommand is unavailable in the 3ds Max 2022 UsdUfe.
     if (itemPath[0] == RemovePrimItem && !isBulkEdit()) {
         return UsdUfe::UsdUndoDeleteCommand::create(prim());
     }
+#endif
 
     // Submenus
     if (itemPath.size() > 1) {
@@ -200,7 +204,7 @@ Ufe::UndoableCommand::Ptr MaxUsdContextOps::doOpCmd(const ItemPath& itemPath)
             const auto usdStageObject = StageObjectMap::GetInstance()->Get(objectPath);
 
             auto nodes = GetReferencingNodes(usdStageObject);
-            if (nodes.size() == 0) {
+            if (nodes.Count() == 0) {
                 return nullptr;
             }
 
@@ -220,8 +224,10 @@ Ufe::UndoableCommand::Ptr MaxUsdContextOps::doOpCmd(const ItemPath& itemPath)
                 mxsCmd.append(L";");
                 mxsCmd.append(L"pickObject count:#multiple select:true rubberBand:_stageNode.pos");
                 FPValue result;
+                // MAXScript::ScriptSource::Dynamic is not a named enumerator before 3ds Max 2023;
+                // its underlying value (3) is used here so this compiles for 2022 as well.
                 if (!ExecuteMAXScriptScript(
-                        mxsCmd.c_str(), MAXScript::ScriptSource::Dynamic, false, &result)) {
+                        mxsCmd.c_str(), static_cast<MAXScript::ScriptSource>(3), false, &result)) {
                     return nullptr;
                 }
                 if (result.type != TYPE_INODE_TAB) {
@@ -258,6 +264,7 @@ Ufe::UndoableCommand::Ptr MaxUsdContextOps::doOpCmd(const ItemPath& itemPath)
 
 Ufe::UndoableCommand::Ptr MaxUsdContextOps::doBulkOpCmd(const ItemPath& itemPath)
 {
+#ifndef MAX_2022 // UsdUndoDeleteCommand is unavailable in the 3ds Max 2022 UsdUfe.
     if (itemPath[0] == RemovePrimItem) {
         std::list<Ufe::CompositeUndoableCommand::Ptr> cmdList;
         for (auto& selItem : _bulkItems) {
@@ -267,6 +274,7 @@ Ufe::UndoableCommand::Ptr MaxUsdContextOps::doBulkOpCmd(const ItemPath& itemPath
         }
         return std::make_shared<Ufe::CompositeUndoableCommand>(cmdList);
     }
+#endif
     return UsdContextOps::doBulkOpCmd(itemPath);
 }
 

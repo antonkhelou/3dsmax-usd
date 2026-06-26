@@ -17,7 +17,9 @@
 #include <MaxUsd.h>
 #include <MaxUsd/MaxUSDAPI.h>
 
+#ifdef IS_MAX2023_OR_GREATER
 #include <Qt/QmaxHelpers.h>
+#endif
 
 #include <QtCore/QObject>
 #include <string>

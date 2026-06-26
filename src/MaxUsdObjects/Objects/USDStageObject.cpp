@@ -71,7 +71,9 @@
 #include <UsdLayerEditor/layerMuting.h>
 #include <UsdLayerEditor/layers.h>
 #include <usdUfe/ufe/UsdSceneItem.h>
+#ifndef MAX_2022 // UsdUndoRenameCommand was added to UsdUfe after 3ds Max 2022 support was dropped.
 #include <usdUfe/ufe/UsdUndoRenameCommand.h>
+#endif
 #include <usdUfe/utils/loadRules.h>
 
 #include <pxr/base/plug/plugin.h>

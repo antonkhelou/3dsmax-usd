@@ -86,6 +86,8 @@
       <AdditionalIncludeDirectories>$(SolutionDir);$(QtInc);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <!--DisableSpecificWarnings>4251;4275;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings-->
+      <!-- boost 1.70 python headers (used for 2022) trip C4275 on dll-interface bases. -->
+      <DisableSpecificWarnings Condition="'$(VersionTarget)'=='2022'">4251;4275;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
       <ForcedIncludeFiles>maxusdtranslators_pch.h</ForcedIncludeFiles>

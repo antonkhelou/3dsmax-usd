@@ -7,6 +7,9 @@
 		<UfeInc Condition="'$(UfeInc)'==''">$(Artifacts)$(VersionTarget)\ufe\ufe-6.5.1\common\include</UfeInc>
 		<UfeLib Condition="'$(UfeLib)'==''">$(Artifacts)$(VersionTarget)\ufe\ufe-6.5.1\platform\Windows\RelWithDebInfo\lib</UfeLib>
 		<PyBind11Inc Condition="'$(PyBind11Inc)'==''">$(RepoRootDir)additional_includes\pybind11\include</PyBind11Inc>
+		<!-- 3ds Max 2022 ships UFE 5.x (ufe_5.lib); 2023+ use UFE 6.x (ufe_6.lib). -->
+		<UfeLibName Condition="'$(VersionTarget)'=='2022'">ufe_5.lib</UfeLibName>
+		<UfeLibName Condition="'$(UfeLibName)'==''">ufe_6.lib</UfeLibName>
 	</PropertyGroup>
 	
 	<ItemDefinitionGroup>
@@ -15,7 +18,7 @@
 		</ClCompile>
 		<Link>
 			<AdditionalLibraryDirectories>$(UfeLib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-			<AdditionalDependencies>ufe_6.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalDependencies>$(UfeLibName);%(AdditionalDependencies)</AdditionalDependencies>
 		</Link>
 	</ItemDefinitionGroup>
 </Project>

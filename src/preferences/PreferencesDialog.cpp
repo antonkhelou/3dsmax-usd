@@ -30,6 +30,7 @@
 #include <AssetResolverPreferences/AssetResolverSettingsManagement.h>
 #include <AssetResolverPreferences/USDAssetResolverSettingsWidget.h>
 #endif
+#include <QPushButton>
 #include <QStyle>
 #include <maxapi.h>
 

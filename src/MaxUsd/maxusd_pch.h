@@ -20,3 +20,12 @@
 #include "plugapi.h"
 #include "windows.h"
 #include "windowsdefines.h"
+
+#ifdef MAX_2022
+// The fmt library bundled in the 3ds Max 2022 devkit's spdlog (fmt 10.x) declares the
+// is_char<wchar_t> specialization in <fmt/xchar.h>. Pull it in up-front so the
+// specialization is visible before any translation unit instantiates is_char<wchar_t>
+// through the primary template (via USD/spdlog headers), which would otherwise raise
+// C2908/C2766 ("explicit specialization after instantiation").
+#include <spdlog/fmt/bundled/xchar.h>
+#endif
