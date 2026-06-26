@@ -510,7 +510,9 @@ void MtlxShaderWriter::Write()
     std::wstringstream ss;
     ss << exportMtlToMtlx << animHandle << L" " << "@"
        << "\"" << MaxUsd::UsdStringToMaxString(p.string()) << "\"" << L'\0';
-    ExecuteMAXScriptScript(ss.str().c_str(), MAXScript::ScriptSource::Dynamic, false, &rvalue);
+    // MAXScript::ScriptSource::Dynamic is not a named enumerator before 3ds Max 2023;
+    // its underlying value (3) is used here so this compiles for 2022 as well.
+    ExecuteMAXScriptScript(ss.str().c_str(), static_cast<MAXScript::ScriptSource>(3), false, &rvalue);
     auto mtlxString = MaxUsd::MaxStringToUsdString(rvalue.s);
     auto mtlxDoc = MaterialX::createDocument();
     try {

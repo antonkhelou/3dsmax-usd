@@ -16,3 +16,9 @@
 
 #pragma once
 #include "renderdelegate_banned.h"
+
+#ifdef MAX_2022
+// See src/MaxUsd/maxusd_pch.h: pull in fmt's is_char<wchar_t> specialization (fmt 10.x in the
+// 2022 devkit's spdlog) before any USD/spdlog header instantiates it, avoiding C2908/C2766.
+#include <spdlog/fmt/bundled/xchar.h>
+#endif

@@ -172,6 +172,9 @@ void MaxLayerEditor::Initialize()
         return true;
     });
 
+    // The UsdLayerEditor DCC-callback registration APIs below were added after 3ds Max 2022
+    // support was dropped and are not present in the 2022 devkit's UsdLayerEditor.
+#ifndef MAX_2022
     UsdLayerEditor::Serialization::setUpdateDCCObjectRootLayerFunction(
         [](const std::string& stageObjectPath, const std::string& rootLayerPath) {
             const auto ufePath = Ufe::PathString::path(stageObjectPath);
@@ -235,6 +238,7 @@ void MaxLayerEditor::Initialize()
     UsdLayerEditor::UIUtils::setErrorDisplayCallbackFunction([](std::string str) {
         MaxUsd::Listener::Write(MaxUsd::UsdStringToMaxString(str).data(), true);
     });
+#endif // !MAX_2022
 
     // Force initialize the instance - hooks up to 3dsmax notifications.
     USDLayerManager::Instance();

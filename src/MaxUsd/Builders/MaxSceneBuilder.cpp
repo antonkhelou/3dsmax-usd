@@ -568,7 +568,9 @@ void MaxSceneBuilder::CreateSMEViewWithMaterials(
         scriptCommand += L")";
 
         // Execute the MaxScript command
-        ExecuteMAXScriptScript(scriptCommand.c_str(), MAXScript::ScriptSource::Dynamic);
+        // MAXScript::ScriptSource::Dynamic is not a named enumerator before 3ds Max 2023;
+        // its underlying value (3) is used here so this compiles for 2022 as well.
+        ExecuteMAXScriptScript(scriptCommand.c_str(), static_cast<MAXScript::ScriptSource>(3));
 
         MaxUsd::Log::Info("Created SME view '{}' with {} materials", viewName, materials.size());
     } catch (const std::exception& e) {

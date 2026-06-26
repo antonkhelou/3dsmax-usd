@@ -26,7 +26,11 @@
 
 #include <maxscript/mxsplugin/mxsplugin.h>
 
+#ifdef MAX_2022 // triangulate.h moved under Geom/ after 3ds Max 2022.
+#include <triangulate.h>
+#else
 #include <Geom/triangulate.h>
+#endif
 #include <IRefTargWrappingRefTarg.h>
 #include <algorithm>
 #include <iInstanceMgr.h>

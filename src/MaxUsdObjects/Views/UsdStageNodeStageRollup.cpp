@@ -86,7 +86,13 @@ void UsdStageNodeStageRollup::RegisterProgressReporter()
     // The global progress bar is configured to disable cancellation,
     // and avoid suspending object edition
     auto start = [this](const std::wstring& title) {
+#ifdef MAX_2022
+        // 3ds Max 2022's ProgressStart requires a progress function and argument.
+        GetCOREInterface()->ProgressStart(
+            title.c_str(), FALSE, [](LPVOID) -> DWORD { return 0; }, nullptr);
+#else
         GetCOREInterface()->ProgressStart(title.c_str(), false);
+#endif
         GetCOREInterface()->ProgressUpdate(0);
     };
     auto update = [this](int progress) {
