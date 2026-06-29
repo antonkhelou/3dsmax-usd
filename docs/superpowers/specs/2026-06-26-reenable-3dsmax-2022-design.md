@@ -68,14 +68,23 @@ MSBuild.exe src\usd-component.sln /m ^
   /p:MaterialXDir="D:\artifactory\unzipped\2022_3dsmax-component-materialX\1.0.0-main_550" ^
   /p:GoogleTestDir="D:\artifactory\unzipped\gtest\1.8.1-3dsmax-vc141-001\gtest" ^
   /p:PyOpenGLDir="D:\artifactory\unzipped\PyOpenGL\3.1.5-cp37\PyOpenGL" ^
+  /p:SpdlogInc="D:\artifactory\unzipped\spdlog\1.6.2\spdlog" ^  REM fmt-6-era spdlog; the provided devkit's spdlog is anachronistically fmt 10.x
   /p:MaxUsdDevKit="D:\devkit-0.10-2022"
 ```
 
 ### Issues resolved beyond the original plan
 
-- **fmt 10.x `is_char<wchar_t>` (C2908/C2766):** the 2022 devkit's spdlog bundles fmt 10.x; including
-  `<spdlog/fmt/bundled/xchar.h>` early (guarded by `MAX_2022`) in each USD-heavy pch registers the
-  specialization before USD/spdlog instantiate it.
+- **fmt `is_char<wchar_t>` (C2908/C2766) — devkit dependency mismatch, not a source defect:**
+  `src/usd_banned.h` pre-includes fmt's `core/format/format-inl` (to dodge the banned-function
+  poisoning). In **fmt 6.x** (what 2022 originally shipped) the `is_char<wchar_t>` specialization lived
+  in `core.h`, so that pre-include was complete. The `D:\devkit-0.10-2022` folder provided here was
+  re-exported with a **much newer spdlog (fmt 10.2.1)** that relocated the specialization into
+  `xchar.h`, which `usd_banned.h` does not pre-include → the spec conflicts with the later (spdlog)
+  inclusion. **Fix:** build against an fmt-6-era spdlog matching the original
+  (`--spdlog "D:\artifactory\unzipped\spdlog\1.6.2\spdlog"`); **no source change**. The source uses only
+  spdlog's template-forwarded logging (no fmt-8+ API) and the devkit components don't expose spdlog in
+  their headers, so the swap is self-contained. A correctly-versioned 2022 devkit would need neither the
+  `--spdlog` override nor any source change.
 - **Newer-than-2022 component APIs guarded with `#ifndef MAX_2022`:** UsdLayerEditor DCC callbacks
   (`setUpdateDCCObjectRootLayerFunction`, `setDCCSceneLocationFunc`, `setDCCWorkspaceSceneLocationFunc`,
   `UIUtils::setErrorDisplayCallbackFunction`), `SaveLayersDialog::saveLayerFilePathUI` (replaced with a Qt
